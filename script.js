@@ -1,4 +1,51 @@
-const cards=document.getElementById('routeCards'), select=document.getElementById('route');
-routes.forEach((r,i)=>{const name=`${r.from} → ${r.to}`;cards.insertAdjacentHTML('beforeend',`<article class="route"><h3>${name}</h3><strong>${r.price.toLocaleString('uk-UA')} грн</strong><p>Розклад буде додано</p><button onclick="chooseRoute(${i})">Обрати</button></article>`);const o=document.createElement('option');o.value=name;o.textContent=`${name} — ${r.price.toLocaleString('uk-UA')} грн`;select.appendChild(o);});
-function chooseRoute(i){select.value=`${routes[i].from} → ${routes[i].to}`;document.getElementById('booking').scrollIntoView({behavior:'smooth'});}
-document.getElementById('bookingForm').addEventListener('submit',e=>{e.preventDefault();alert('Форма готова. Наступним етапом підключимо Telegram, щоб заявка приходила вам автоматично.');});
+const TELEGRAM_WEB_APP_URL =
+  'https://script.google.com/macros/s/AKfycbzZyXoyj1c_k8chcI2c7frnVga0k5gKIacCvs7nb7Ry-rJKjOdcpYpL0ADQS_vpTUwdQA/exec';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector('#bookingForm');
+
+  if (!form) return;
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const button = form.querySelector('button[type="submit"]');
+
+    const data = {
+      name: form.querySelector('[name="name"]')?.value || '',
+      phone: form.querySelector('[name="phone"]')?.value || '',
+      route: form.querySelector('[name="route"]')?.value || '',
+      date: form.querySelector('[name="date"]')?.value || '',
+      seats: form.querySelector('[name="seats"]')?.value || '',
+      comment: form.querySelector('[name="comment"]')?.value || ''
+    };
+
+    if (!data.name  !data.phone  !data.route || !data.date) {
+      alert('Пожалуйста, заполните имя, телефон, маршрут и дату.');
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = 'Отправляем...';
+
+    try {
+      await fetch(TELEGRAM_WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(data)
+      });
+
+      alert('✅ Заявка отправлена! Мы свяжемся с вами.');
+
+      form.reset();
+
+    } catch (error) {
+      console.error(error);
+      alert('❌ Не удалось отправить заявку. Позвоните нам по телефону.');
+
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Забронировать';
+    }
+  });
+});
