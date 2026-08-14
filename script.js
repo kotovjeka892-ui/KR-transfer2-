@@ -3,23 +3,27 @@ const TELEGRAM_WEB_APP_URL =
 
 document.addEventListener('DOMContentLoaded', function () {
 
-  // ===== МАРШРУТЫ =====
-  const routeCards = document.querySelector('#routeCards');
-  const routeSelect = document.querySelector('#route');
+  // =========================
+  // МАРШРУТЫ
+  // =========================
+
+  const routeCards = document.getElementById('routeCards');
+  const routeSelect = document.getElementById('route');
 
   if (typeof routes !== 'undefined') {
 
-    // Карточки маршрутов
+    // Выводим карточки маршрутов
     if (routeCards) {
       routeCards.innerHTML = routes.map(function (route) {
+
         return `
           <article class="route-card">
-            <div class="route-title">
-              ${route.from} → ${route.to}
-            </div>
+            <h3>${route.from} → ${route.to}</h3>
+
             <div class="route-price">
               ${route.price} грн
             </div>
+
             <button
               class="btn primary route-book"
               type="button"
@@ -28,90 +32,151 @@ document.addEventListener('DOMContentLoaded', function () {
             </button>
           </article>
         `;
+
       }).join('');
     }
 
-    // Список маршрутов в форме
+    // Заполняем список маршрутов в форме
     if (routeSelect) {
+
       routes.forEach(function (route) {
+
         const option = document.createElement('option');
 
-        option.value = route.from + ' → ' + route.to;
+        option.value =
+          route.from + ' → ' + route.to;
+
         option.textContent =
-          route.from + ' → ' + route.to + ' — ' + route.price + ' грн';
+          route.from +
+          ' → ' +
+          route.to +
+          ' — ' +
+          route.price +
+          ' грн';
 
         routeSelect.appendChild(option);
+
       });
+
     }
+
   }
 
-  // ===== КНОПКИ «ЗАБРОНИРОВАТЬ» НА КАРТОЧКАХ =====
+
+  // =========================
+  // КНОПКИ НА МАРШРУТАХ
+  // =========================
+
   document.querySelectorAll('.route-book').forEach(function (button) {
 
     button.addEventListener('click', function () {
 
+      const selectedRoute = button.dataset.route;
+
       if (routeSelect) {
-        routeSelect.value = button.dataset.route;
+        routeSelect.value = selectedRoute;
       }
 
-      const booking = document.querySelector('#booking');
+      const booking =
+        document.getElementById('booking');
 
       if (booking) {
+
         booking.scrollIntoView({
           behavior: 'smooth'
         });
+
       }
 
     });
 
   });
 
-  // ===== ФОРМА БРОНИРОВАНИЯ =====
-  const form = document.querySelector('#bookingForm');
+
+  // =========================
+  // ФОРМА БРОНИРОВАНИЯ
+  // =========================
+
+  const form =
+    document.getElementById('bookingForm');
 
   if (!form) return;
+
 
   form.addEventListener('submit', async function (event) {
 
     event.preventDefault();
 
-    const button = form.querySelector('button[type="submit"]');
+    const button =
+      form.querySelector('button[type="submit"]');
+
 
     const data = {
-      name: document.querySelector('#name')?.value || '',
-      phone: document.querySelector('#phoneInput')?.value || '',
-      route: document.querySelector('#route')?.value || '',
-      date: document.querySelector('#date')?.value || '',
-      seats: document.querySelector('#seats')?.value || '',
-      comment: document.querySelector('#comment')?.value || ''
+
+      name:
+        document.getElementById('name')?.value || '',
+
+      phone:
+        document.getElementById('phoneInput')?.value || '',
+
+      route:
+        document.getElementById('route')?.value || '',
+
+      date:
+        document.getElementById('date')?.value || '',
+
+      seats:
+        document.getElementById('seats')?.value || '',
+
+      comment:
+        document.getElementById('comment')?.value || ''
+
     };
 
-    // Проверка обязательных полей
-    if (!data.name  !data.phone  !data.route || !data.date) {
+
+    // Проверяем обязательные поля
+
+    if (
+      !data.name ||
+      !data.phone ||
+      !data.route ||
+      !data.date
+    ) {
 
       alert(
         'Пожалуйста, заполните имя, телефон, маршрут и дату.'
       );
 
       return;
+
     }
 
+
     button.disabled = true;
-    button.textContent = 'ОТПРАВЛЯЕМ...';
+
+    button.textContent =
+      'ОТПРАВЛЯЕМ...';
+
 
     try {
 
-      await fetch(TELEGRAM_WEB_APP_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify(data)
-      });
+      await fetch(
+        TELEGRAM_WEB_APP_URL,
+        {
+          method: 'POST',
+          mode: 'no-cors',
+          body: JSON.stringify(data)
+        }
+      );
+
 
       alert(
         '✅ Заявка отправлена! Мы свяжемся с вами.'
       );
 
+
       form.reset();
+
 
     } catch (error) {
 
@@ -121,12 +186,13 @@ document.addEventListener('DOMContentLoaded', function () {
         '❌ Не удалось отправить заявку. Позвоните нам по телефону.'
       );
 
-    } finally {
-
-      button.disabled = false;
-      button.textContent = 'ЗАБРОНИРОВАТЬ МЕСТО';
-
     }
+
+
+    button.disabled = false;
+
+    button.textContent =
+      'ЗАБРОНИРОВАТЬ МЕСТО';
 
   });
 
