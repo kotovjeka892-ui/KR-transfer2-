@@ -1,2 +1,4 @@
-function choose(route){document.getElementById('route').value=route;document.getElementById('booking').scrollIntoView({behavior:'smooth'});}
-function submitForm(e){e.preventDefault();alert('Демо: форма працює. На наступному кроці підключимо реальні заявки в Telegram.');}
+const cards=document.getElementById('routeCards'), select=document.getElementById('route');
+routes.forEach((r,i)=>{const name=`${r.from} → ${r.to}`;cards.insertAdjacentHTML('beforeend',`<article class="route"><h3>${name}</h3><strong>${r.price.toLocaleString('uk-UA')} грн</strong><p>Розклад буде додано</p><button onclick="chooseRoute(${i})">Обрати</button></article>`);const o=document.createElement('option');o.value=name;o.textContent=`${name} — ${r.price.toLocaleString('uk-UA')} грн`;select.appendChild(o);});
+function chooseRoute(i){select.value=`${routes[i].from} → ${routes[i].to}`;document.getElementById('booking').scrollIntoView({behavior:'smooth'});}
+document.getElementById('bookingForm').addEventListener('submit',e=>{e.preventDefault();alert('Форма готова. Наступним етапом підключимо Telegram, щоб заявка приходила вам автоматично.');});
